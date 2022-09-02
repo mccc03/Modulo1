@@ -17,9 +17,9 @@ def variance(array, mean):
 ## I/O directory and files
 
 directory = '/home/exterior/Documents/Physics/MetodiNumerici/Modulo1/_data/'
-input_parameters=open(directory+'parameters.txt',"r")
-input_bta=open(directory+'bta.txt',"r")
-output_data=open(directory+'resampling_output_data.txt',"a") # access mode for appending lines
+input_parameters=open(directory+'input/parameters.txt',"r")
+input_bta=open(directory+'input/bta.txt',"r")
+output_data=open(directory+'output/resampling_output_data.txt',"a") # access mode for appending lines
 
 
 ## Read input parameters

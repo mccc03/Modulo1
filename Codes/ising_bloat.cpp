@@ -46,6 +46,7 @@ int measures; // Number of measures
 int decorrel_len; // Guess for decorrelation length
 double ext_field; // External magnetic field's value
 double bta; // Inverse of temperature
+int resamplings; // Number of resamplings
 
 /* Pointers to the adjacent sites */
 int * npp;
@@ -60,9 +61,10 @@ ifstream input_Lattice;
 ifstream input_Parameters;
 ofstream output_Energy;
 ofstream output_Magnetization;
-
-ifstream bta_input;
-ofstream bta_output;
+ofstream output_Susceptibility;
+ofstream output_EnergyResampled;
+ofstream output_MagnetizationResampled;
+ofstream output_SusceptibilityResampled;
 
 
 /////////////////////////
@@ -76,6 +78,7 @@ void Metropolis(double ** matrix, long int * seed); // Generates Markov chain
 double Energy(double ** matrix); // Computes energy density
 double Magnetization(double ** matrix); // Computes magnetization density
 double Susceptibility(double ** matrix); // Computes susceptibility
+void BootstrapResampling(double * in_array, double * out_array, long int * seed); // Resampling function
 double MeanValue(double * array, int len_array); // Computes mean value
 
 
@@ -86,23 +89,23 @@ double MeanValue(double * array, int len_array); // Computes mean value
 int main() {
 
     /* Reading the simulation parameters from parameters.txt */
-    input_Parameters.open("/home/exterior/Documents/Physics/MetodiNumerici/Modulo1/_data/input/parameters.txt", ios::in); // Opening file
+    input_Parameters.open("/home/exterior/Documents/Physics/MetodiNumerici/Modulo1/_data/parameters.txt", ios::in); // Opening file
     if (input_Parameters.is_open()) { // Check if file is open, then read
 
         string line;
         string::size_type sz;
         getline(input_Parameters, line);
+        init_flag = stoi(line,&sz);
+        getline(input_Parameters, line);
         measures = stoi(line,&sz);
-        getline(input_Parameters, line); // skip, resampling block length
-        getline(input_Parameters, line); // skip, number of resamplings
         getline(input_Parameters, line);
         decorrel_len = stoi(line,&sz);
         getline(input_Parameters, line);
-        Nlatt = stoi(line,&sz);
-        getline(input_Parameters, line);
-        init_flag = stoi(line,&sz);
-        getline(input_Parameters, line);
         ext_field = stod(line,&sz);
+        getline(input_Parameters, line);
+        bta = stod(line,&sz);
+        getline(input_Parameters, line);
+        resamplings = stoi(line,&sz);
 
         input_Parameters.close();
 
@@ -112,14 +115,9 @@ int main() {
         cerr << "Unable to open parameters file.\n";
     }
 
-    bta_input.open("/home/exterior/Documents/Physics/MetodiNumerici/Modulo1/_data/input/bta.txt", ios::in); // Opening beta.txt file, value stored in this file for easier access during recursion
-    if(bta_input.is_open()){
-        string line;
-        string::size_type sz;
-        getline(bta_input, line);
-        bta = stod(line,&sz);
-    }
-    bta_input.close();
+    /* We ask the user to enter the length of the side of the square on which the simulation is going to run*/
+    cout << "Please, enter the length of the side of the square, i.e. Nlatt (remember that Nlatt must be an integer): ";
+    cin >> Nlatt;
 
     /* Initialize seed for RNG */
     seed = &seed_start;
@@ -139,6 +137,14 @@ int main() {
         spin_matrix[count] = new double[Nlatt];
     }
 
+    /* Create dinamically allocated arrays - whatever that means - so that we don't run into segmentation faults for large values of measures variable */
+    double * energy_array = new double[measures];
+    double * energy_resampled_array = new double[measures];
+    double * magnetization_array = new double[measures];
+    double * magnetization_resampled_array = new double[measures];
+    double * susceptibility_array = new double[measures];
+    double * susceptibility_resampled_array = new double[measures];
+
     /* Initialize spin matrix */
     input_Lattice.open("/home/exterior/Documents/Physics/MetodiNumerici/Modulo1/_data/lattice.txt", ios::in);
     if(input_Lattice.is_open()){ // Check if file is open, then run
@@ -152,46 +158,63 @@ int main() {
     /* Open output files */
     output_Energy.open("/home/exterior/Documents/Physics/MetodiNumerici/Modulo1/_data/energy.txt", ios::trunc);
     output_Magnetization.open("/home/exterior/Documents/Physics/MetodiNumerici/Modulo1/_data/magnetization.txt", ios::trunc);
+    output_Susceptibility.open("/home/exterior/Documents/Physics/MetodiNumerici/Modulo1/_data/sus.txt", ios::trunc);
+    output_EnergyResampled.open("/home/exterior/Documents/Physics/MetodiNumerici/Modulo1/_data/energy_res.txt", ios::trunc);
+    output_MagnetizationResampled.open("/home/exterior/Documents/Physics/MetodiNumerici/Modulo1/_data/magnetization_res.txt", ios::trunc);
+    output_SusceptibilityResampled.open("/home/exterior/Documents/Physics/MetodiNumerici/Modulo1/_data/susceptibility_res.txt", ios::trunc);
 
     /* Check if output files are open then run algorithm */
-    if(output_Energy.is_open() && output_Magnetization.is_open()){
+    if(output_Energy.is_open() && output_Magnetization.is_open() && output_Susceptibility.is_open() && output_EnergyResampled.is_open() && output_MagnetizationResampled.is_open() && output_SusceptibilityResampled.is_open()){
 
         /* Start Markov chain and take a measurement for each iteration */
 
         for(int l=0;l<measures;l++){
 
-            /* Call Metropolis function decorrel_len times before taking a measurement*/
-            for(int r=0;r<decorrel_len;r++){
-                Metropolis(spin_matrix,seed);
-            }
+            /* Call Metropolis function with no decorrelation */
+            Metropolis(spin_matrix,seed);
 
             /* Taking physical measurements */
             double ene = Energy(spin_matrix);
             double mag = Magnetization(spin_matrix);
+            double sus = Susceptibility(spin_matrix);
+
+            /* Writing measurements onto arrays */
+            energy_array[l] = ene;
+            magnetization_array[l] = mag;
+            susceptibility_array[l] = sus;
 
             /* Writing measurements onto output files */
             output_Energy << ene << "\n";
             output_Magnetization << mag << "\n";
+            output_Susceptibility << sus << "\n";
 
+        }
+
+        /* Start Bootstrap algorithm */
+        for(int k=0;k<resamplings;k++){
+            BootstrapResampling(energy_array, energy_resampled_array, seed);
+            BootstrapResampling(magnetization_array, magnetization_resampled_array, seed);
+            BootstrapResampling(susceptibility_array, susceptibility_resampled_array, seed);
+            double ene_res = MeanValue(energy_resampled_array, measures);
+            double mag_res = MeanValue(magnetization_resampled_array, measures);
+            double sus_res = MeanValue(susceptibility_resampled_array, measures);
+            output_EnergyResampled << k << "\t" << ene_res << "\n";
+            output_MagnetizationResampled << k << "\t" << mag_res << "\n";
+            output_SusceptibilityResampled << k << "\t" << sus_res << "\n";
         }
 
     /* Closing output files */
     output_Energy.close();
     output_Magnetization.close();
+    output_Susceptibility.close();
+    output_EnergyResampled.close();
+    output_MagnetizationResampled.close();
+    output_SusceptibilityResampled.close();
 
     }
-
     else{// print error message
         cerr << "Unable to open output file(s).\n";
     }
-
-    /* Prepare bta for next iteration */
-    bta_output.open("/home/exterior/Documents/Physics/MetodiNumerici/Modulo1/_data/input/bta.txt", ios::trunc);
-    if(bta_output.is_open()){
-        bta = bta+0.001;
-        bta_output << bta << "\n";
-    }
-    bta_output.close();
 
     return 0;
 }
@@ -362,9 +385,36 @@ double Magnetization(double ** matrix){
         }
     }
     // I actually need the average magnetization
-    return (magnetization_c)/(double)(Nlatt*Nlatt);
+    // The abs value is needed in order to identify the phase transition
+    return fabs(magnetization_c)/(double)(Nlatt*Nlatt);
 }
 
+/*I dont know yet whether to include this or not*/
+double Susceptibility(double ** matrix){
+    double sum = 0.0;
+    double sum_sq = 0.0;
+    for(int i=0; i<Nlatt; i++){
+        for(int j=0; j<Nlatt; j++){
+            sum = sum + matrix[i][j];
+            sum_sq = sum_sq + matrix[i][j]*matrix[i][j];
+        }
+    }
+    return fabs(sum_sq-sum*sum)/(double)(Nlatt*Nlatt);
+}
+
+void BootstrapResampling(double * in_array, double * out_array, long int * seed){
+  int j = (int)(measures*Ran2(seed));
+  for(int p=0;p<measures/decorrel_len;p++){
+    for(int s=0;s<decorrel_len;s++){
+      if(j+decorrel_len>measures){
+        *(out_array +p*decorrel_len +s) = *(in_array +(measures-s-1));
+      }
+      else{
+        *(out_array +p*decorrel_len +s) = *(in_array +(j+s));
+      }
+    }
+  }
+}
 
 double MeanValue(double * array, int len_array){
     double sum = 0.0;

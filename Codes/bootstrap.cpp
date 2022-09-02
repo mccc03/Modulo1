@@ -83,7 +83,7 @@ int main(){
     seed = &seed_start;
 
     /* Read input parameters */
-    input_Parameters.open("/home/exterior/Documents/Physics/MetodiNumerici/Modulo1/_data/parameters.txt", ios::in);
+    input_Parameters.open("/home/exterior/Documents/Physics/MetodiNumerici/Modulo1/_data/input/parameters.txt", ios::in);
     if(input_Parameters.is_open()){
         string line;
         string::size_type sz;
@@ -103,7 +103,7 @@ int main(){
     }
 
 
-    bta_input.open("/home/exterior/Documents/Physics/MetodiNumerici/Modulo1/_data/bta.txt", ios::in); // Opening beta.txt file, value stored in this file for easier access during recursion
+    bta_input.open("/home/exterior/Documents/Physics/MetodiNumerici/Modulo1/_data/input/bta.txt", ios::in); // Opening beta.txt file, value stored in this file for easier access during recursion
     if(bta_input.is_open()){
         string line;
         string::size_type sz;
