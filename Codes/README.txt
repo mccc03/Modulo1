@@ -1,4 +1,4 @@
-The file parameters.txt in the folder _data/ contains the input variables for the simulation, in the following order:
+The file parameters.txt in the folder _data/input/ contains the input variables for the simulation, in the following order:
 
 measures --> (int) number of measurements taken
 resampling_len --> (int) block length for the resampling process
