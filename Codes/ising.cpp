@@ -93,7 +93,6 @@ int main() {
         string::size_type sz;
         getline(input_Parameters, line);
         measures = stoi(line,&sz);
-        getline(input_Parameters, line); // skip, resampling block length
         getline(input_Parameters, line); // skip, number of resamplings
         getline(input_Parameters, line);
         decorrel_len = stoi(line,&sz);

@@ -36,8 +36,11 @@ long int * seed;
 
 ifstream input_Parameters;
 ifstream energy_input;
+ofstream energy_output;
 ifstream magnetization_input;
-ofstream data_output;
+ofstream magnetization_output;
+ofstream susceptibility_output;
+ofstream heatcapacity_output;
 ifstream bta_input;
 
 
@@ -47,7 +50,7 @@ ifstream bta_input;
 
 int measures;
 int resamples;
-//int resampling_len;
+int resampling_len;
 double bta;
 int Nlatt;
 
@@ -60,10 +63,6 @@ double * energy_array;
 double * magnetization_array;
 double * energy_resampled_array;
 double * magnetization_resampled_array;
-double * ene_bs;
-double * mag_bs;
-double * sus_bs;
-double * heatc_bs;
 
 /////////////////////////
 /* Declaring functions */
@@ -91,9 +90,10 @@ int main(){
         getline(input_Parameters, line);
         measures = stoi(line,&sz);
         getline(input_Parameters, line);
+        resampling_len = stoi(line,&sz);
+        getline(input_Parameters, line);
         resamples = stoi(line,&sz);
         getline(input_Parameters, line);
-        //decorrel_len = stoi(line,&sz);
         getline(input_Parameters, line);
         Nlatt = stoi(line,&sz);
         input_Parameters.close();
@@ -108,7 +108,7 @@ int main(){
         string line;
         string::size_type sz;
         getline(bta_input, line);
-        bta = stod(line,&sz) - 0.001;
+        bta = stod(line,&sz);
     }
     else{ // Error message
         cerr << "Could not read beta parameter file";
@@ -121,10 +121,6 @@ int main(){
     energy_resampled_array = new double[measures];
     magnetization_array = new double[measures];
     magnetization_resampled_array = new double[measures];
-    ene_bs = new double[resamples];
-    mag_bs = new double[resamples];
-    sus_bs = new double[resamples];
-    heatc_bs = new double[resamples];
 
 
     /* Open stored values for energy and magnetization */
@@ -151,94 +147,54 @@ int main(){
     magnetization_input.close();
 
     /* Open output files */
-    data_output.open("/home/exterior/Documents/Physics/MetodiNumerici/Modulo1/_data/output/data.txt", ios::app);
+    energy_output.open("/home/exterior/Documents/Physics/MetodiNumerici/Modulo1/_data/ene_res.txt", ios::trunc);
+    magnetization_output.open("/home/exterior/Documents/Physics/MetodiNumerici/Modulo1/_data/mag_res.txt", ios::trunc);
+    susceptibility_output.open("/home/exterior/Documents/Physics/MetodiNumerici/Modulo1/_data/sus_res.txt", ios::trunc);
+    heatcapacity_output.open("/home/exterior/Documents/Physics/MetodiNumerici/Modulo1/_data/heatc_res.txt", ios::trunc);
 
-    /* Declare random int for resampling */
+    /* Declare random int for resampling*/
     int j;
 
-    /* Declare variables for standard deviations */
-    double dev_ene=0.0;
-    double dev_ene_tmp;
-    double dev_mag=0.0;
-    double dev_mag_tmp;
-    double dev_sus=0.0;
-    double dev_sus_tmp;
-    double dev_heatc=0.0;
-    double dev_heatc_tmp;
-
-    /* The bootstrap algorithm computes the standard deviations for resamplings of different binning size, represented by resampling_len. The standard deviations should increase when the binning size increases, until they hit a plateau. The asymptotic value of the standard deviations are to be considered the correct uncertainties of their associated estimators */
-    int resampling_len=32;
-
-
     /* Start bootstrap algorithm */
-
-    if(data_output.is_open()){
-        /* Repeat resampling for exponentially increasing binning size */
-        while(resampling_len<1+measures/10){
-            for(int k=0;k<resamples;k++){
-                for(int p=0;p<measures/resampling_len;p++){
-                    for(int s=0;s<resampling_len;s++){
-                        j = (int)(measures*Ran2(seed));
-                        /* Fill resampled arrays */
-                        if(j+resampling_len>measures){
-                            *(energy_resampled_array +p*resampling_len +s) = *(energy_array +(measures-s-1));
-                            *(magnetization_resampled_array +p*resampling_len +s) = *(magnetization_array +(measures-s-1));
-                        }
-                        else{
-                            *(energy_resampled_array +p*resampling_len +s) = *(energy_array +(j+s));
-                            *(magnetization_resampled_array +p*resampling_len +s) = *(magnetization_array +(j+s));
-                        }
+    if(energy_output.is_open() && magnetization_output.is_open() && susceptibility_output.is_open() && heatcapacity_output.is_open()){
+        for(int k=0;k<resamples;k++){
+            for(int p=0;p<measures/resampling_len;p++){
+                for(int s=0;s<resampling_len;s++){
+                    j = (int)(measures*Ran2(seed));
+                    if(j+resampling_len>measures){
+                        *(energy_resampled_array +p*resampling_len +s) = *(energy_array +(measures-s-1));
+                        *(magnetization_resampled_array +p*resampling_len +s) = *(magnetization_array +(measures-s-1));
+                    }
+                    else{
+                        *(energy_resampled_array +p*resampling_len +s) = *(energy_array +(j+s));
+                        *(magnetization_resampled_array +p*resampling_len +s) = *(magnetization_array +(j+s));
                     }
                 }
-                /* For each resampling, compute needed estimators and store them into arrays */
-                ene_bs[k] = MeanValue(energy_resampled_array, measures);
-                mag_bs[k] = MeanValue(magnetization_resampled_array, measures);
-                sus_bs[k] = bta*Nlatt*Nlatt*Variance(magnetization_resampled_array, measures);
-                heatc_bs[k] = bta*bta*Nlatt*Nlatt*Variance(energy_resampled_array, measures);
             }
 
-            /* Compute standard deviations of resamplings */
-            dev_ene_tmp=sqrt(Variance(ene_bs, resamples));
-            dev_mag_tmp=sqrt(Variance(mag_bs, resamples));
-            dev_sus_tmp=sqrt(Variance(sus_bs, resamples));
-            dev_heatc_tmp=sqrt(Variance(heatc_bs, resamples));
+            energy_output << k << "\t" << MeanValue(energy_resampled_array, measures) << "\n";
+            magnetization_output << k << "\t" << MeanValue(magnetization_resampled_array, measures) << "\n";
+            susceptibility_output << k << "\t" << bta*Nlatt*Nlatt*Variance(magnetization_resampled_array, measures) << "\n";
+            heatcapacity_output << k << "\t" << bta*bta*Nlatt*Nlatt*Variance(energy_resampled_array, measures) << "\n";
 
-            /* Only keep highest value of standard deviations */
-            if(dev_ene_tmp>dev_ene){
-                dev_ene=dev_ene_tmp;
-            }
-            if(dev_mag_tmp>dev_mag){
-                dev_mag=dev_mag_tmp;
-            }
-            if(dev_sus_tmp>dev_sus){
-                dev_sus=dev_sus_tmp;
-            }
-            if(dev_heatc_tmp>dev_heatc){
-                dev_heatc=dev_heatc_tmp;
-            }
-
-            resampling_len = resampling_len*2; // Exponential increase
         }
-
-        /* Store measures onto output file */
-        data_output << Nlatt << "\t" << bta - 0.001 << "\t" << MeanValue(energy_array, measures) << "\t" << dev_ene << "\t" << MeanValue(magnetization_array, measures) << "\t" << dev_mag << "\t" << bta*Nlatt*Nlatt*Variance(magnetization_resampled_array, measures) << "\t" << dev_sus << "\t" << bta*bta*Nlatt*Nlatt*Variance(energy_resampled_array, measures) << "\t" << dev_heatc << "\n";
     }
 
     else{ // Error message
         cerr << "Could not open output files";
     }
 
-    data_output.close();
+    energy_output.close();
+    magnetization_output.close();
+    susceptibility_output.close();
+    heatcapacity_output.close();
 
     /* Deallocating memory */
     delete[] energy_array;
     delete[] energy_resampled_array;
     delete[] magnetization_array;
     delete[] magnetization_resampled_array;
-    delete[] ene_bs;
-    delete[] mag_bs;
-    delete[] sus_bs;
-    delete[] heatc_bs;
+
 
     return 0;
 }

@@ -1,13 +1,11 @@
 The file parameters.txt in the folder _data/input/ contains the input variables for the simulation, in the following order:
 
 measures --> (int) number of measurements taken
-resampling_len --> (int) block length for the resampling process
 resamplings --> (int) number of times the measurements are resampled
 decorrel_len --> (int) number of times the matrix is updated before taking a measurement
 Nlatt --> (int) length of the side of the matrix
 init_flag --> (int) that initializes the matrix: if its value is (0) then all the spins are aligned (cold state), if its value is (1) then all the spins are random (hot state), for any other integer the matrix is initialized in the final state of the previous iteration of the simulation
 ext_field --> (double) value of the external magnetic field
-bta --> (double) value for the inverse of the temperature
 
 
 The file ising_data_analysis.py stores the value of bta and Nlatt onto its output file, so keep this in mind when changing it during the simulations
