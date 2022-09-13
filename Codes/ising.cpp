@@ -76,7 +76,6 @@ void Metropolis(double ** matrix, long int * seed); // Generates Markov chain
 double Energy(double ** matrix); // Computes energy density
 double Magnetization(double ** matrix); // Computes magnetization density
 double Susceptibility(double ** matrix); // Computes susceptibility
-double MeanValue(double * array, int len_array); // Computes mean value
 
 
 //////////////////
@@ -361,14 +360,7 @@ double Magnetization(double ** matrix){
         }
     }
     // I actually need the average magnetization
-    return (magnetization_c)/(double)(Nlatt*Nlatt);
+    return fabs(magnetization_c)/(double)(Nlatt*Nlatt);
 }
 
 
-double MeanValue(double * array, int len_array){
-    double sum = 0.0;
-    for(int i=0;i<len_array;i++){
-        sum = sum + array[i];
-    }
-    return (double)(sum/len_array);
-}
