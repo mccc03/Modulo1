@@ -138,14 +138,15 @@ int main() {
     }
 
     /* Initialize spin matrix */
-    input_Lattice.open("/home/exterior/Documents/Physics/MetodiNumerici/Modulo1/_data/lattice.txt", ios::in);
+    /*input_Lattice.open("/home/exterior/Documents/Physics/MetodiNumerici/Modulo1/_data/lattice.txt", ios::in);
     if(input_Lattice.is_open()){ // Check if file is open, then run
         Lattice_init(spin_matrix, init_flag, seed);
         input_Lattice.close();
     }
     else { // Error message
         cerr << "Unable to open Lattice file.\n";
-    }
+    }*/
+    Lattice_init(spin_matrix, init_flag, seed);
 
     /* Open output files */
     output_Energy.open("/home/exterior/Documents/Physics/MetodiNumerici/Modulo1/_data/energy.txt", ios::trunc);
@@ -182,6 +183,7 @@ int main() {
     else{// print error message
         cerr << "Unable to open output file(s).\n";
     }
+
 
     /* Prepare bta for next iteration */
     bta_output.open("/home/exterior/Documents/Physics/MetodiNumerici/Modulo1/_data/input/bta.txt", ios::trunc);
@@ -257,7 +259,7 @@ void Lattice_init(double ** matrix, int flag, long int * seed){
     }
 
   // Initialize matrix whose elements are random (hot)
-    else if(flag==1){
+    else{
         for(int row=0; row<Nlatt; row++){
             for(int column=0; column<Nlatt; column++){
                 float random_number = Ran2(seed);
@@ -273,7 +275,7 @@ void Lattice_init(double ** matrix, int flag, long int * seed){
 
   // Initialize matrix whose elements are read from the last iteration
   // of the algorithm
-    else {
+  /*  else {
         for(int row=0; row<Nlatt; row++){
             for(int column=0; column<Nlatt; column++){
                 string line;
@@ -282,7 +284,7 @@ void Lattice_init(double ** matrix, int flag, long int * seed){
                 matrix[row][column] = stod(line,&sz);
             }
         }
-    }
+    }*/
 
   return;
 }

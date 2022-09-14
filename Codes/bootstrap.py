@@ -11,6 +11,7 @@ input_parameters=open(directory+'input/parameters.txt',"r")
 input_bta=open(directory+'input/bta.txt',"r")
 output_data=open(directory+'output/data.txt',"a")
 
+
 ## Read input parameters
 
 input_par_list = input_parameters.readlines()
