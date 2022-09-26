@@ -56,9 +56,8 @@ int * nmm;
 /* I/O files */
 ///////////////
 
-ifstream input_Lattice;
+// ifstream input_Lattice;
 ifstream input_Parameters;
-ofstream output_Energy;
 ofstream output_Magnetization;
 
 ifstream bta_input;
@@ -73,7 +72,6 @@ float Ran2(long *idum); // Random number generator
 void Geometry(int * movePlus, int * moveMinus); // Generates proximity arrays
 void Lattice_init(double ** matrix, int flag, long int * seed); // Initializes matrix in a state defined by iflag
 void Metropolis(double ** matrix, long int * seed); // Generates Markov chain
-double Energy(double ** matrix); // Computes energy density
 double Magnetization(double ** matrix); // Computes magnetization density
 double Susceptibility(double ** matrix); // Computes susceptibility
 
@@ -149,11 +147,10 @@ int main() {
     Lattice_init(spin_matrix, init_flag, seed);
 
     /* Open output files */
-    output_Energy.open("/home/exterior/Documents/Physics/MetodiNumerici/Modulo1/_data/energy.txt", ios::trunc);
     output_Magnetization.open("/home/exterior/Documents/Physics/MetodiNumerici/Modulo1/_data/magnetization.txt", ios::trunc);
 
     /* Check if output files are open then run algorithm */
-    if(output_Energy.is_open() && output_Magnetization.is_open()){
+    if(output_Magnetization.is_open()){
 
         /* Start Markov chain and take a measurement for each iteration */
 
@@ -165,17 +162,14 @@ int main() {
             }
 
             /* Taking physical measurements */
-            double ene = Energy(spin_matrix);
             double mag = Magnetization(spin_matrix);
 
             /* Writing measurements onto output files */
-            output_Energy << ene << "\n";
             output_Magnetization << mag << "\n";
 
         }
 
     /* Closing output files */
-    output_Energy.close();
     output_Magnetization.close();
 
     }
@@ -322,31 +316,6 @@ void Metropolis(double ** matrix, long int * seed){
     }
 
   return;
-}
-
-/* The Energy function explores the whole matrix and computes the energy density*/
-double Energy(double ** matrix){
-
-    // This will be inside a cycle, so I have to reset energy_c
-    double energy_c = 0.0;
-
-    // Cycle over the entire matrix
-    for(int i=0; i<Nlatt; i++){
-        for(int j=0; j<Nlatt; j++){
-            int ip = *(npp + i);
-            int im = *(nmm + i);
-            int jp = *(npp +j);
-            int jm = *(nmm +j);
-            double force = matrix[i][jp]+matrix[i][jm]+matrix[ip][j]+matrix[im][j];
-            /* 0.5 factor is needed because I am counting
-            each site twice during summation*/
-            energy_c = energy_c - 0.5*force*matrix[i][j];
-            energy_c = energy_c - ext_field*matrix[i][j];
-        }
-    }
-
-    // What I need is actually the energy density
-    return energy_c/(double)(Nlatt*Nlatt);
 }
 
 /* The Magnetization function explores the matrix and returns the abs value of its normalized element-wise sum*/
