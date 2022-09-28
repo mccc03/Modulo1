@@ -60,9 +60,13 @@ ifstream input_Lattice;
 ifstream input_Parameters;
 ofstream output_Energy;
 ofstream output_Magnetization;
+ofstream output_Lattice;
 
 ifstream bta_input;
 ofstream bta_output;
+
+ifstream old_Nlatt_input;
+ofstream old_Nlatt_output;
 
 
 /////////////////////////
@@ -138,19 +142,20 @@ int main() {
     }
 
     /* Initialize spin matrix */
-    /*input_Lattice.open("/home/exterior/Documents/Physics/MetodiNumerici/Modulo1/_data/lattice.txt", ios::in);
-    if(input_Lattice.is_open()){ // Check if file is open, then run
+    input_Lattice.open("/home/exterior/Documents/Physics/MetodiNumerici/Modulo1/_data/lattice.txt", ios::in);
+    old_Nlatt_input.open("/home/exterior/Documents/Physics/MetodiNumerici/Modulo1/_data/old_Nlatt.txt", ios::in);
+    if(input_Lattice.is_open() && old_Nlatt_input.is_open()){ // Check if file is open, then run
         Lattice_init(spin_matrix, init_flag, seed);
         input_Lattice.close();
     }
     else { // Error message
         cerr << "Unable to open Lattice file.\n";
-    }*/
-    Lattice_init(spin_matrix, init_flag, seed);
+    }
 
     /* Open output files */
     output_Energy.open("/home/exterior/Documents/Physics/MetodiNumerici/Modulo1/_data/energy.txt", ios::trunc);
     output_Magnetization.open("/home/exterior/Documents/Physics/MetodiNumerici/Modulo1/_data/magnetization.txt", ios::trunc);
+    output_Lattice.open("/home/exterior/Documents/Physics/MetodiNumerici/Modulo1/_data/lattice.txt", ios::trunc);
 
     /* Check if output files are open then run algorithm */
     if(output_Energy.is_open() && output_Magnetization.is_open()){
@@ -249,7 +254,7 @@ void Geometry(int * movePlus, int * moveMinus){
 /* The following function creates a matrix whose configuration depends on the value of init_flag */
 void Lattice_init(double ** matrix, int flag, long int * seed){
 
-    // Initialize matrix whose elements are all 1.0 (cold)
+    /* Initialize matrix whose elements are all 1.0 (cold) */
     if(flag==0){
         for(int row=0; row<Nlatt; row++){
             for(int column=0; column<Nlatt; column++){
@@ -258,8 +263,8 @@ void Lattice_init(double ** matrix, int flag, long int * seed){
         }
     }
 
-  // Initialize matrix whose elements are random (hot)
-    else{
+    /* Initialize matrix whose elements are random (hot) */
+    else if(flag==1){
         for(int row=0; row<Nlatt; row++){
             for(int column=0; column<Nlatt; column++){
                 float random_number = Ran2(seed);
@@ -273,20 +278,29 @@ void Lattice_init(double ** matrix, int flag, long int * seed){
         }
     }
 
-  // Initialize matrix whose elements are read from the last iteration
-  // of the algorithm
-  /*  else {
-        for(int row=0; row<Nlatt; row++){
-            for(int column=0; column<Nlatt; column++){
-                string line;
-                string::size_type sz;
-                getline(input_Lattice, line);
-                matrix[row][column] = stod(line,&sz);
+    /* Initialize matrix whose elements are read from the last iteration
+    of the algorithm */
+    else{
+        string line;
+        string::size_type sz;
+        getline(old_Nlatt_input, line);
+        int old_Nlatt = stod(line,&sz);
+        if(old_Nlatt==Nlatt){
+            for(int row=0; row<Nlatt; row++){
+                for(int column=0; column<Nlatt; column++){
+                    string line;
+                    string::size_type sz;
+                    getline(input_Lattice, line);
+                    matrix[row][column] = stod(line,&sz);
+                }
             }
         }
-    }*/
+        else{
+            cerr << "Can't load matrix of a different size.\n";
+        }
+    }
 
-  return;
+    return;
 }
 
 /* The Metropolis function defines the Markov chain. */
@@ -324,7 +338,7 @@ void Metropolis(double ** matrix, long int * seed){
   return;
 }
 
-/* The Energy function explores the whole matrix and computes the energy density*/
+/* The Energy function explores the whole matrix and computes the energy density */
 double Energy(double ** matrix){
 
     // This will be inside a cycle, so I have to reset energy_c
@@ -349,7 +363,7 @@ double Energy(double ** matrix){
     return energy_c/(double)(Nlatt*Nlatt);
 }
 
-/* The Magnetization function explores the matrix and returns the abs value of its normalized element-wise sum*/
+/* The Magnetization function explores the matrix and returns the abs value of its normalized element-wise sum */
 double Magnetization(double ** matrix){
 
     // This will be inside a cycle, so I have to reset magnetization_c
@@ -362,7 +376,7 @@ double Magnetization(double ** matrix){
         }
     }
     // I actually need the average magnetization
-    return (magnetization_c)/(double)(Nlatt*Nlatt);
+    return abs(magnetization_c)/(double)(Nlatt*Nlatt);
 }
 
 

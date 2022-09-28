@@ -6,6 +6,7 @@ decorrel_len --> (int) number of times the matrix is updated before taking a mea
 Nlatt --> (int) length of the side of the matrix
 init_flag --> (int) that initializes the matrix: if its value is (0) then all the spins are aligned (cold state), otherwise all the spins are random (hot state)
 ext_field --> (double) value of the external magnetic field
+thermal_len --> (int) measures to be discarded
 
 
 The file ising_data_analysis.py stores the value of bta and Nlatt onto its output file, so keep this in mind when changing it during the simulations

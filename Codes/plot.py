@@ -11,11 +11,14 @@ directory = '/home/exterior/Documents/Physics/MetodiNumerici/Modulo1/_data/'
 
 ## Load input data
 
-Nlatt, bta, ene, dev_ene, mag, dev_mag, sus, dev_sus, heatc, dev_heatc = np.loadtxt(directory+'output/data.txt', unpack=True)
+Nlatt, bta, ene, dev_ene, mag, dev_mag, sus, dev_sus, heatc, dev_heatc, binder, dev_binder = np.loadtxt(directory+'output/data.txt', unpack=True)
 
 
 ## Split data arrays into subarrays, one for each value of Nlatt, creating lists of lists, so that the order of the file data.txt is unimportant when plotting, allowing for additional simulations to be run
 
+## Create lists of lists, first index
+
+Nlatt_split=[]
 bta_split=[]
 ene_split=[]
 dev_ene_split=[]
@@ -25,7 +28,10 @@ sus_split=[]
 dev_sus_split=[]
 heatc_split=[]
 dev_heatc_split=[]
-Nlatt_split=[]
+binder_split=[]
+dev_binder_split=[]
+
+## Create lists of lists, second index
 
 for _ in range(6):
     bta_split.append([])
@@ -37,6 +43,10 @@ for _ in range(6):
     dev_sus_split.append([])
     heatc_split.append([])
     dev_heatc_split.append([])
+    binder_split.append([])
+    dev_binder_split.append([])
+
+## Fill arrays from data
 
 for i in range(len(Nlatt)):
     for j in range(6):
@@ -50,6 +60,8 @@ for i in range(len(Nlatt)):
             dev_sus_split[j].append(dev_sus[i])
             heatc_split[j].append(heatc[i])
             dev_heatc_split[j].append(dev_heatc[i])
+            binder_split[j].append(binder[i])
+            dev_binder_split[j].append(dev_binder[i])
 
 for k in range(6):
     Nlatt_split.append(k*10 + 10)
@@ -120,6 +132,22 @@ plt.errorbar(bta_split[2],heatc_split[2], yerr=dev_heatc_split[2], color='red',f
 plt.errorbar(bta_split[3],heatc_split[3], yerr=dev_heatc_split[3], color='cyan',fmt='>',label="Nlatt=%d"%(Nlatt_split[3]))
 plt.errorbar(bta_split[4],heatc_split[4], yerr=dev_heatc_split[4], color='green',fmt='v',label="Nlatt=%d"%(Nlatt_split[4]))
 plt.errorbar(bta_split[5],heatc_split[5], yerr=dev_heatc_split[5], color='blue',fmt='^',label="Nlatt=%d"%(Nlatt_split[5]))
+plt.legend(loc="upper left")
+
+## Plot Binder cumulant for different Nlatt values
+
+plt.figure(5)
+
+plt.title('Binder cumulant')
+plt.ylabel(r'$1-\frac{\langle m^4\rangle}{3\langle m^2\rangle ^2}$')
+plt.xlabel(r'$\beta$')
+plt.grid(color = 'gray')
+plt.errorbar(bta_split[0],binder_split[0], yerr=dev_binder_split[0], color='gray',fmt=',',label="Nlatt=%d"%(Nlatt_split[0]))
+plt.errorbar(bta_split[1],binder_split[1], yerr=dev_binder_split[1], color='orange',fmt='.',label="Nlatt=%d"%(Nlatt_split[1]))
+plt.errorbar(bta_split[2],binder_split[2], yerr=dev_binder_split[2], color='red',fmt='<',label="Nlatt=%d"%(Nlatt_split[2]))
+plt.errorbar(bta_split[3],binder_split[3], yerr=dev_binder_split[3], color='cyan',fmt='>',label="Nlatt=%d"%(Nlatt_split[3]))
+plt.errorbar(bta_split[4],binder_split[4], yerr=dev_binder_split[4], color='green',fmt='v',label="Nlatt=%d"%(Nlatt_split[4]))
+plt.errorbar(bta_split[5],binder_split[5], yerr=dev_binder_split[5], color='blue',fmt='^',label="Nlatt=%d"%(Nlatt_split[5]))
 plt.legend(loc="upper left")
 
 
