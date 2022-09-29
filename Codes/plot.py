@@ -67,6 +67,24 @@ for k in range(6):
     Nlatt_split.append(k*10 + 10)
 
 
+## Find list index of maximum of susceptibility
+p=0
+for l in range(len(sus_split[5])-1):
+    if(sus_split[5][l+1]>sus_split[5][l]):
+        p=l+1
+
+## Approximate bta_c with point of maximum of susceptibility
+bta_c = bta_split[5][p]
+
+## Create reduced temperature variable
+t = []
+chi = []
+dev_chi=[]
+for m in range(15):
+    t.append(np.log(bta_c*(1.0/bta_split[5][p-15+m])-1))
+    chi.append(np.log(sus_split[5][p-15+m]))
+    dev_chi.append(dev_sus_split[5][p-15+m]/sus_split[5][p-15+m])
+
 ## Plot magnetization for different Nlatt values
 
 plt.figure(1)
@@ -150,5 +168,14 @@ plt.errorbar(bta_split[4],binder_split[4], yerr=dev_binder_split[4], color='gree
 plt.errorbar(bta_split[5],binder_split[5], yerr=dev_binder_split[5], color='blue',fmt='^',label="Nlatt=%d"%(Nlatt_split[5]))
 plt.legend(loc="upper left")
 
+## Plot chi vs t
+
+plt.figure(6)
+
+plt.title('Susceptibility near critical point')
+plt.ylabel(r'$M$')
+plt.xlabel(r'$\beta$')
+plt.grid(color = 'gray')
+plt.errorbar(t,chi, yerr=dev_chi, color='red')
 
 plt.show()
