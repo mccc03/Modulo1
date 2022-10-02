@@ -80,6 +80,7 @@ void Metropolis(double ** matrix, long int * seed); // Generates Markov chain
 double Energy(double ** matrix); // Computes energy density
 double Magnetization(double ** matrix); // Computes magnetization density
 double Susceptibility(double ** matrix); // Computes susceptibility
+void SaveLattice(double ** matrix); // Saves lattice for next iteration
 
 
 //////////////////
@@ -195,8 +196,20 @@ int main() {
     if(bta_output.is_open()){
         bta = bta+0.001;
         bta_output << bta << "\n";
-    }
     bta_output.close();
+    }
+    else{// print error message
+        cerr << " Unable to open bta.txt file.\n";
+    }
+
+    /* Save lattice for next iteration */
+    output_Lattice.open("/home/exterior/Documents/Physics/MetodiNumerici/Modulo1/_data/lattice.txt", ios::trunc);
+    if(output_Lattice.is_open()){
+        SaveLattice(spin_matrix);
+    }
+    else{//print error message
+        cerr << "Could not save lattice in lattice.txt";
+    }
 
     return 0;
 }
@@ -303,6 +316,18 @@ void Lattice_init(double ** matrix, int flag, long int * seed){
     return;
 }
 
+/* This function stores the spin value of the lattice in a text file for later use */
+void SaveLattice(double ** matrix){
+
+    for(int row=0; row<Nlatt; row++){
+        for(int column=0; column<Nlatt; column++){
+            output_Lattice << matrix[row][column] << "\n";
+        }
+    }
+
+    return;
+}
+
 /* The Metropolis function defines the Markov chain. */
 void Metropolis(double ** matrix, long int * seed){
 
@@ -378,5 +403,6 @@ double Magnetization(double ** matrix){
     // I actually need the average magnetization
     return abs(magnetization_c)/(double)(Nlatt*Nlatt);
 }
+
 
 
