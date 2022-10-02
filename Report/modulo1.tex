@@ -1,0 +1,68 @@
+%----------------------------------------------------------------------------------------
+%	PACKAGES AND OTHER DOCUMENT CONFIGURATIONS
+%----------------------------------------------------------------------------------------
+
+\documentclass[11pt]{scrartcl} % Font size
+
+\input{header.tex} % Include the file specifying the document structure and custom commands
+
+%----------------------------------------------------------------------------------------
+%	TITLE SECTION
+%----------------------------------------------------------------------------------------
+
+\title{	
+	\normalfont\normalsize
+	\textsc{University of Pisa, Physics Department}\\ % Your university, school and/or department name(s)
+	\vspace{25pt} % Whitespace
+	\rule{\linewidth}{0.5pt}\\ % Thin top horizontal rule
+	\vspace{20pt} % Whitespace
+	{\huge Simulation of $2$-dimensional Ising model}\\ % The assignment title
+	\vspace{12pt} % Whitespace
+	\rule{\linewidth}{2pt}\\ % Thick bottom horizontal rule
+	\vspace{12pt} % Whitespace
+}
+
+\author{\LARGE Marco Cocciaretto,  \LARGE Miriam Patricolo} % Your name
+
+\date{\normalsize\today} % Today's date (\today) or a custom date
+
+\begin{document}
+
+\maketitle
+
+\section*{Abstract}
+We ran a simulation of a $2$-dimensional Ising model; our scope was to study the behaviour of the system near its critcal temperature $T_c$ and to derive its critical exponents. Since our computers are not infinitely powerful, we simulated the system for finite lattice sizes, but we were able to study the phase transitions through Finite Size Scaling, which enabled us to understand how the system would behave if it were of infinite size.
+
+\section{Ising model}
+The Ising model represents the interaction between classical spins fixed on a grid. Its hamiltonian is:
+\begin{equation}
+	\label{ising}
+	H = -J \sum _{\langle i,j \rangle} S_i S_j - h\sum_i S_i
+\end{equation}
+In our simulation, we fixed the following variables:
+\begin{equation}
+	\label{choice}
+	\begin{array}{c}
+		k_B = 1 \\
+		J = 1 \\
+		h = 0
+	\end{array}
+\end{equation}
+\subsection{Continuous phase transition}
+With our choice \eqref{choice}, in the thermodynamical limit, we expect to find a continuous phase transition at an inverse temperature:
+\begin{equation}
+	\beta _c = \frac{1}{T_c} \simeq 0.4406868
+\end{equation}
+In a neighbourhood of $\beta _c$, we expect a critical behaviour of the system described by the variable $t\equiv (T-T_c)/T_c \propto\beta - \beta _c$ and the power laws:
+\begin{eqnarray}
+	\xi \sim \abs{t}^{-\nu} & \\
+	\exval{M} \sim \abs{t} ^{\beta} & \quad t<0\\
+	\chi \equiv \frac{\partial \exval{M}}{\partial h} = \frac{V}{T}\left(\exval{M^2}-\exval{M} ^2\right)\sim \abs{t} ^{-\gamma} & \\
+	C \equiv \frac{\partial \exval{\epsilon}}{\partial T} = \frac{V}{T^2}\left(\exval{\epsilon^2}-\exval{\epsilon} ^2\right) \sim \abs{t}^{-\alpha} &
+\end{eqnarray}
+Where $\xi$ is the correlation length, $V$ is the volume of the system, $M$ is the magnetization density, $\epsilon$ is the energy density, $\chi$ is the magnetic susceptibility and $C$ is the thermal capacity.
+The theoretical values of the critical exponents in a $2$-dimensionsonal Ising model are the following:
+\begin{equation}
+\alpha = 0 \quad \beta = 1/8 \quad \gamma = 7/4 \quad \nu =1
+\end{equation}
+\end{document}
