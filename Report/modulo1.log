@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.24 (TeX Live 2022) (preloaded format=pdflatex 2022.9.29)  30 SEP 2022 09:43
+This is pdfTeX, Version 3.141592653-2.6-1.40.24 (TeX Live 2022) (preloaded format=pdflatex 2022.9.29)  6 OCT 2022 18:32
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -760,6 +760,36 @@ Package: tabularray 2022-07-01 v2022C Typeset tabulars and arrays with LaTeX3
 \l__tblr_cell_wd_dim=\dimen279
 \l__tblr_cell_ht_dim=\dimen280
 \l__tblr_diag_box=\box82
+)
+(/home/exterior/texlive/texmf-dist/tex/latex/caption/subcaption.sty
+Package: subcaption 2022/01/07 v1.5 Sub-captions (AR)
+
+(/home/exterior/texlive/texmf-dist/tex/latex/caption/caption.sty
+Package: caption 2022/03/01 v3.6b Customizing captions (AR)
+
+(/home/exterior/texlive/texmf-dist/tex/latex/caption/caption3.sty
+Package: caption3 2022/03/17 v2.3b caption3 kernel (AR)
+\caption@tempdima=\dimen281
+\captionmargin=\dimen282
+\caption@leftmargin=\dimen283
+\caption@rightmargin=\dimen284
+\caption@width=\dimen285
+\caption@indent=\dimen286
+\caption@parindent=\dimen287
+\caption@hangindent=\dimen288
+Package caption Info: KOMA-Script document class detected.
+
+(/home/exterior/texlive/texmf-dist/tex/latex/caption/caption-koma.sto
+File: caption-koma.sto 2020/09/21 v2.0b Adaption of the caption package to the 
+KOMA-Script document classes (AR)
+))
+\c@caption@flags=\count327
+\c@continuedfloat=\count328
+Package caption Info: hyperref package is loaded.
+Package caption Info: listings package is loaded.
+)
+\c@subfigure=\count329
+\c@subtable=\count330
 ))
 (./modulo1.aux)
 \openout1 = `modulo1.aux'.
@@ -813,20 +843,20 @@ Package scrbase Info: activating english \listfigurename on input line 29.
 Package scrbase Info: activating english \listtablename on input line 29.
 Package scrbase Info: activating english \refname on input line 29.
 Package scrbase Info: activating english \indexname on input line 29.
-\c@lstlisting=\count327
+\c@lstlisting=\count331
 
 (/home/exterior/texlive/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
-\scratchcounter=\count328
-\scratchdimen=\dimen281
+\scratchcounter=\count332
+\scratchdimen=\dimen289
 \scratchbox=\box83
-\nofMPsegments=\count329
-\nofMParguments=\count330
+\nofMPsegments=\count333
+\nofMParguments=\count334
 \everyMPshowfont=\toks33
-\MPscratchCnt=\count331
-\MPscratchDim=\dimen282
-\MPnumerator=\count332
-\makeMPintoPDFobject=\count333
+\MPscratchCnt=\count335
+\MPscratchDim=\dimen290
+\MPnumerator=\count336
+\makeMPintoPDFobject=\count337
 \everyMPtoPDFconversion=\toks34
 ) (/home/exterior/texlive/texmf-dist/tex/latex/epstopdf-pkg/epstopdf-base.sty
 Package: epstopdf-base 2020-01-24 v2.11 Base part for package epstopdf
@@ -902,8 +932,10 @@ Package: bookmark 2020-11-06 v1.29 PDF bookmarks (HO)
 
 (/home/exterior/texlive/texmf-dist/tex/latex/bookmark/bkm-pdftex.def
 File: bkm-pdftex.def 2020-11-06 v1.29 bookmark driver for pdfTeX (HO)
-\BKM@id=\count334
+\BKM@id=\count338
 ))
+Package caption Info: Begin \AtBeginDocument code.
+Package caption Info: End \AtBeginDocument code.
 LaTeX Font Info:    Trying to load font information for T1+cmss on input line 3
 2.
 
@@ -969,29 +1001,91 @@ LaTeX Font Info:    Font shape `U/futm/m/n' will be
 
 
 {/home/exterior/texlive/texmf-var/fonts/map/pdftex/updmap/pdftex.map}]
-[2] (./modulo1.aux)
+LaTeX Font Info:    Trying to load font information for T1+cmtt on input line 9
+7.
+
+(/home/exterior/texlive/texmf-dist/tex/latex/base/t1cmtt.fd
+File: t1cmtt.fd 2019/12/16 v2.5j Standard LaTeX font definitions
+)
+LaTeX Font Info:    Font shape `FMX/futm/m/n' will be
+(Font)              scaled to size 8.27998pt on input line 97.
+LaTeX Font Info:    Font shape `FMX/futm/m/n' will be
+(Font)              scaled to size 6.99199pt on input line 97.
+LaTeX Font Info:    Font shape `U/futm/m/n' will be
+(Font)              scaled to size 8.27998pt on input line 97.
+LaTeX Font Info:    Font shape `U/futm/m/n' will be
+(Font)              scaled to size 6.99199pt on input line 97.
+ [2]
+LaTeX Font Info:    Trying to load font information for TS1+futs on input line 
+99.
+
+(/home/exterior/texlive/texmf-dist/tex/latex/fourier/ts1futs.fd
+File: ts1futs.fd 2003/09/14 Fontinst v1.801 font definitions for TS1/futs.
+)
+Overfull \hbox (5.68103pt too wide) in paragraph at lines 104--105
+\T1/futs/m/n/10.95 ar-ray of ob-serv-able would end up hav-ing \T1/cmtt/m/n/10.
+95 resamplings \T1/futs/m/n/10.95 el-e-ments (we fixed $[] \FMS/futm/m/n/10.95 
+Å
+ []
+
+[3]
+<figures/energy_density.png, id=60, 693.792pt x 325.215pt>
+File: figures/energy_density.png Graphic file (type png)
+<use figures/energy_density.png>
+Package pdftex.def Info: figures/energy_density.png  used on input line 133.
+(pdftex.def)             Requested size: 405.45047pt x 190.05399pt.
+<figures/magnetization_density.png, id=62, 693.792pt x 325.215pt>
+File: figures/magnetization_density.png Graphic file (type png)
+<use figures/magnetization_density.png>
+Package pdftex.def Info: figures/magnetization_density.png  used on input line 
+137.
+(pdftex.def)             Requested size: 405.45047pt x 190.05399pt.
+<figures/magnetic_susceptibility.png, id=63, 693.792pt x 325.215pt>
+File: figures/magnetic_susceptibility.png Graphic file (type png)
+<use figures/magnetic_susceptibility.png>
+Package pdftex.def Info: figures/magnetic_susceptibility.png  used on input lin
+e 141.
+(pdftex.def)             Requested size: 405.45047pt x 190.05399pt.
+<figures/heat_capacity.png, id=64, 693.792pt x 325.215pt>
+File: figures/heat_capacity.png Graphic file (type png)
+<use figures/heat_capacity.png>
+Package pdftex.def Info: figures/heat_capacity.png  used on input line 145.
+(pdftex.def)             Requested size: 405.45047pt x 190.05399pt.
+<figures/binder.png, id=65, 693.792pt x 325.215pt>
+File: figures/binder.png Graphic file (type png)
+<use figures/binder.png>
+Package pdftex.def Info: figures/binder.png  used on input line 149.
+(pdftex.def)             Requested size: 405.45047pt x 190.05399pt.
+ [4 <./figures/energy_density.png> <./figures/magnetization_density.png>]
+[5 <./figures/magnetic_susceptibility.png> <./figures/heat_capacity.png> <./fig
+ures/binder.png>] [6] (./modulo1.aux)
 Package rerunfilecheck Info: File `modulo1.out' has not changed.
 (rerunfilecheck)             Checksum: D41D8CD98F00B204E9800998ECF8427E;0.
  ) 
 Here is how much of TeX's memory you used:
- 19919 strings out of 475075
- 384786 string characters out of 5779508
- 898757 words of memory out of 5000000
- 41021 multiletter control sequences out of 15000+600000
- 564995 words of font info for 125 fonts, out of 8000000 for 9000
+ 21506 strings out of 475075
+ 416029 string characters out of 5779508
+ 925509 words of memory out of 5000000
+ 42527 multiletter control sequences out of 15000+600000
+ 588700 words of font info for 161 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 108i,20n,106p,10602b,475s stack positions out of 10000i,1000n,20000p,200000b,200000s
-{/home/exterior/texlive/texmf-dist/fonts/enc/dvips/base/8r.enc}</home/exterio
-r/texlive/texmf-dist/fonts/type1/public/fourier/fourier-mex.pfb></home/exterior
-/texlive/texmf-dist/fonts/type1/public/fourier/fourier-mlit.pfb></home/exterior
-/texlive/texmf-dist/fonts/type1/public/fourier/fourier-ms.pfb></home/exterior/t
-exlive/texmf-dist/fonts/type1/adobe/utopia/putb8a.pfb></home/exterior/texlive/t
-exmf-dist/fonts/type1/adobe/utopia/putr8a.pfb></home/exterior/texlive/texmf-dis
-t/fonts/type1/adobe/utopia/putri8a.pfb>
-Output written on modulo1.pdf (2 pages, 61823 bytes).
+ 108i,20n,106p,10602b,622s stack positions out of 10000i,1000n,20000p,200000b,200000s
+{/home/exterior/texlive/texmf-dist/fonts/enc/dvips/cm-super/cm-super-t1.enc}{
+/home/exterior/texlive/texmf-dist/fonts/enc/dvips/base/8r.enc}</home/exterior/t
+exlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt10.pfb></home/exterior/tex
+live/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt9.pfb></home/exterior/texliv
+e/texmf-dist/fonts/type1/public/fourier/fourier-mex.pfb></home/exterior/texlive
+/texmf-dist/fonts/type1/public/fourier/fourier-mlit.pfb></home/exterior/texlive
+/texmf-dist/fonts/type1/public/fourier/fourier-ms.pfb></home/exterior/texlive/t
+exmf-dist/fonts/type1/adobe/utopia/putb8a.pfb></home/exterior/texlive/texmf-dis
+t/fonts/type1/adobe/utopia/putr8a.pfb></home/exterior/texlive/texmf-dist/fonts/
+type1/adobe/utopia/putri8a.pfb></home/exterior/texlive/texmf-dist/fonts/type1/p
+ublic/cm-super/sftt0900.pfb></home/exterior/texlive/texmf-dist/fonts/type1/publ
+ic/cm-super/sftt1095.pfb>
+Output written on modulo1.pdf (6 pages, 345001 bytes).
 PDF statistics:
- 66 PDF objects out of 1000 (max. 8388607)
- 49 compressed objects within 1 object stream
- 11 named destinations out of 1000 (max. 500000)
- 17 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 184 PDF objects out of 1000 (max. 8388607)
+ 144 compressed objects within 2 object streams
+ 47 named destinations out of 1000 (max. 500000)
+ 90 words of extra memory for PDF output out of 10000 (max. 10000000)
 

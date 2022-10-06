@@ -76,7 +76,7 @@ ofstream old_Nlatt_output;
 float Ran2(long *idum); // Random number generator
 void Geometry(int * movePlus, int * moveMinus); // Generates proximity arrays
 void Lattice_init(double ** matrix, int flag, long int * seed); // Initializes matrix in a state defined by iflag
-void Metropolis(double ** matrix, long int * seed); // Generates Markov chain
+void Metropolis(double ** matrix, long int * seed, int dec_len); // Generates Markov chain
 double Energy(double ** matrix); // Computes energy density
 double Magnetization(double ** matrix); // Computes magnetization density
 double Susceptibility(double ** matrix); // Computes susceptibility
@@ -165,10 +165,8 @@ int main() {
 
         for(int l=0;l<measures;l++){
 
-            /* Call Metropolis function decorrel_len times before taking a measurement*/
-            for(int r=0;r<decorrel_len;r++){
-                Metropolis(spin_matrix,seed);
-            }
+            /* Call Metropolis to update lattice decorrel_len times before taking a measurement*/
+            Metropolis(spin_matrix,seed,decorrel_len);
 
             /* Taking physical measurements */
             double ene = Energy(spin_matrix);
@@ -178,7 +176,16 @@ int main() {
             output_Energy << ene << "\n";
             output_Magnetization << mag << "\n";
 
+            /* Print loading bar */
+
+            double progress = (double)((l+1)*100.0/measures);
+
+
+            cout << "Simulation running... " << progress << " %\r";
+            cout.flush();
         }
+
+    cout << "Simulation finished for bta = " << bta << "\n";
 
     /* Closing output files */
     output_Energy.close();
@@ -194,7 +201,7 @@ int main() {
     /* Prepare bta for next iteration */
     bta_output.open("/home/exterior/Documents/Physics/MetodiNumerici/Modulo1/_data/input/bta.txt", ios::trunc);
     if(bta_output.is_open()){
-        bta = bta+0.001;
+        bta = bta+0.0005;
         bta_output << bta << "\n";
     bta_output.close();
     }
@@ -202,14 +209,14 @@ int main() {
         cerr << " Unable to open bta.txt file.\n";
     }
 
-    /* Save lattice for next iteration */
+    /* Save lattice for next iteration *//*
     output_Lattice.open("/home/exterior/Documents/Physics/MetodiNumerici/Modulo1/_data/lattice.txt", ios::trunc);
     if(output_Lattice.is_open()){
         SaveLattice(spin_matrix);
     }
     else{//print error message
         cerr << "Could not save lattice in lattice.txt";
-    }
+    }*/
 
     return 0;
 }
@@ -329,34 +336,37 @@ void SaveLattice(double ** matrix){
 }
 
 /* The Metropolis function defines the Markov chain. */
-void Metropolis(double ** matrix, long int * seed){
+void Metropolis(double ** matrix, long int * seed, int dec_len){
 
-    for(int ivol=0; ivol<(Nlatt*Nlatt); ivol++){
+    for(int h=0;h<dec_len;h++){
 
-        // Selecting a random site of the matrix
-        int i = (int)(round(Ran2(seed)*(Nlatt-1)));
-        int j = (int)(round(Ran2(seed)*(Nlatt-1)));
+        for(int ivol=0; ivol<(Nlatt*Nlatt); ivol++){
 
-        // Using the results of Geometry to select the adjacent sites
-        int ip = *(npp + i);
-        int im = *(nmm + i);
-        int jp = *(npp +j);
-        int jm = *(nmm +j);
+            // Selecting a random site of the matrix
+            int i = (int)(round(Ran2(seed)*(Nlatt-1)));
+            int j = (int)(round(Ran2(seed)*(Nlatt-1)));
 
-        // This is where "physics" kicks in, we need to compute the "Hamiltonian"
-        // of the system and update the matrix based on that value
-        double force = matrix[i][jp]+matrix[i][jm]+matrix[ip][j]+matrix[im][j];
-        force = bta*(force+ext_field);
+            // Using the results of Geometry to select the adjacent sites
+            int ip = *(npp + i);
+            int im = *(nmm + i);
+            int jp = *(npp +j);
+            int jm = *(nmm +j);
 
-        double phi = matrix[i][j]; // Current spin value
+            // This is where "physics" kicks in, we need to compute the "Hamiltonian"
+            // of the system and update the matrix based on that value
+            double force = matrix[i][jp]+matrix[i][jm]+matrix[ip][j]+matrix[im][j];
+            force = bta*(force+ext_field);
 
-        // Probability ratio with inverted spin
-        double prob_ratio = exp(-2.0*phi*force);
+            double phi = matrix[i][j]; // Current spin value
 
-        // Last thing we need is the Metropolis test
-        float u = Ran2(seed);
-        if(u<prob_ratio){
-            matrix[i][j] = -phi;
+            // Probability ratio with inverted spin
+            double prob_ratio = exp(-2.0*phi*force);
+
+            // Last thing we need is the Metropolis test
+            float u = Ran2(seed);
+            if(u<prob_ratio){
+                matrix[i][j] = -phi;
+            }
         }
     }
 
