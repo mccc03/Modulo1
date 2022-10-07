@@ -103,7 +103,7 @@ def CreateFitArray(x_matrix, y_matrix, dev_y_matrix,size):
             y_list.append(y_matrix[size][i])
             dy_list.append(dev_y_matrix[size][i])
 
-            if(len(t_list)==20):
+            if(len(t_list)==30):
                 t = np.array(t_list)
                 y = np.array(y_list)
                 dy = np.array(dy_list)

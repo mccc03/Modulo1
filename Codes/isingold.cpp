@@ -339,31 +339,33 @@ void SaveLattice(double ** matrix){
 void Metropolis(double ** matrix, long int * seed, int dec_len){
 
     for(int h=0;h<dec_len;h++){
-        for(int i=0; i<Nlatt; i++){
-            for(int j=0; j<Nlatt; j++){
 
-                // Using the results of Geometry to select the adjacent sites
-                int ip = *(npp + i);
-                int im = *(nmm + i);
-                int jp = *(npp +j);
-                int jm = *(nmm +j);
+        for(int ivol=0; ivol<(Nlatt*Nlatt); ivol++){
 
-                // This is where "physics" kicks in, we need to compute the "Hamiltonian"
-                // of the system and update the matrix based on that value
-                double force = matrix[i][jp]+matrix[i][jm]+matrix[ip][j]+matrix[im][j];
-                force = bta*(force+ext_field);
+            // Selecting a random site of the matrix
+            int i = (int)(round(Ran2(seed)*(Nlatt-1)));
+            int j = (int)(round(Ran2(seed)*(Nlatt-1)));
 
-                double phi = matrix[i][j]; // Current spin value
+            // Using the results of Geometry to select the adjacent sites
+            int ip = *(npp + i);
+            int im = *(nmm + i);
+            int jp = *(npp +j);
+            int jm = *(nmm +j);
 
-                // Probability ratio with inverted spin
-                double prob_ratio = exp(-2.0*phi*force);
+            // This is where "physics" kicks in, we need to compute the "Hamiltonian"
+            // of the system and update the matrix based on that value
+            double force = matrix[i][jp]+matrix[i][jm]+matrix[ip][j]+matrix[im][j];
+            force = bta*(force+ext_field);
 
-                // Last thing we need is the Metropolis test
-                float u = Ran2(seed);
-                if(u<prob_ratio){
-                    matrix[i][j] = -phi;
+            double phi = matrix[i][j]; // Current spin value
 
-                }
+            // Probability ratio with inverted spin
+            double prob_ratio = exp(-2.0*phi*force);
+
+            // Last thing we need is the Metropolis test
+            float u = Ran2(seed);
+            if(u<prob_ratio){
+                matrix[i][j] = -phi;
             }
         }
     }
