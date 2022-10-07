@@ -87,27 +87,24 @@ def FindMax(x_array, y_array, dev_y_array):
 
 ## Define function that creates lists of measures after critical point, considering bta_c = 0.44
 
-def CreateFitArray(x_matrix, y_matrix, dev_y_matrix,size):
+def CreateFitArray(x_matrix, y_matrix, dev_y_matrix):
     t_list = []
     y_list = []
     dy_list = []
 
-    x_max, dev_x_max, y_max, dev_y_max = FindMaxMulti(x_matrix, y_matrix, dev_y_matrix)
+    x_max, dev_x_max, y_max, dev_y_max = FindMax(x_matrix, y_matrix, dev_y_matrix)
 
     i=0
 
-    while(i<(len(x_matrix[size]))):
-        if(x_matrix[size][i] > x_max[size] + 0.019):
+    while(i<(len(x_matrix))):
+        if(x_matrix[i] > 0.44 + 0.016):
 
-            t_list.append(1-x_max[size]/x_matrix[size][i])
-            y_list.append(y_matrix[size][i])
-            dy_list.append(dev_y_matrix[size][i])
+            t_list.append(1-0.44/x_matrix[i])
+            y_list.append(y_matrix[i])
+            dy_list.append(dev_y_matrix[i])
 
-            if(len(t_list)==30):
-                t = np.array(t_list)
-                y = np.array(y_list)
-                dy = np.array(dy_list)
-
+            if(len(t_list)==35):
+                t,y,dy = Logalize(t_list,y_list,dy_list)
                 return t, y, dy
         i = i+1
 
@@ -210,10 +207,10 @@ print(f'chisq = {chisq_gammanu:.4f}')
 
 ## Find gamma from susceptibility
 
-t, chi, dev_chi = CreateFitArray(bta_split, sus_split, dev_sus_split, 5)
+t, chi, dev_chi = CreateFitArray(bta1, sus1, dev_sus1)
 
-initial_values=(-1.75, 0.003, 0.0)
-popt_gamma, pcov_gamma, chisq_gamma = Fit(FitPower, t, chi, dev_chi, initial_values)
+initial_values=(-1.75, 0.003)
+popt_gamma, pcov_gamma, chisq_gamma = Fit(FitLine, t, chi, dev_chi, initial_values)
 
 ## Print fit values of gamma
 
@@ -272,6 +269,7 @@ for i in range(len(mag_split)):
 
 ## Plot magnetization for different Nlatt values
 
+'''
 plt.figure(1)
 
 plt.title('Magnetization')
@@ -396,11 +394,11 @@ plt.errorbar(x_fss[3],binder_fss[3], yerr=dev_binder_fss[3], color='cyan',fmt='>
 plt.errorbar(x_fss[4],binder_fss[4], yerr=dev_binder_fss[4], color='green',fmt='v',label="Nlatt=%d"%(Nlatt_split[4]))
 plt.errorbar(x_fss[5],binder_fss[5], yerr=dev_binder_fss[5], color='blue',fmt='^',label="Nlatt=%d"%(Nlatt_split[5]))
 plt.legend(loc="upper left")
-
+'''
 
 plt.figure(9)
 plt.grid(color = 'gray')
 plt.errorbar(t,chi,yerr=dev_chi)
-plt.plot(t,FitPower(t,*popt_gamma))
+plt.plot(t,FitLine(t,*popt_gamma))
 
 plt.show()
