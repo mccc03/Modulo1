@@ -13,11 +13,13 @@ def FitPower(x,g,m,c):
 def FitParabola(x,m,b,a):
     return m - b*(x-a)*(x-a)
 
-def FitLine(x,m,c):
+def FitLinear(x,m,c):
     return m*x + c
 
 def FitBta(L, b_max, x_max, a):
     return b_max - x_max*(L**(-a))
+
+## This funtions returns the values for the best fit parameters as a list, for the covariance matrix as a matrix and for the normalized \chi^2 of the fit.
 
 def Fit(fit_func,x,y,dy,initial_values):
     arr_x = np.array(x)
@@ -25,11 +27,15 @@ def Fit(fit_func,x,y,dy,initial_values):
     arr_dy = np.array(dy)
 
     popt, pcov = curve_fit(fit_func, arr_x, arr_y, sigma=arr_dy, p0=initial_values, absolute_sigma=False)
+
     chisq = (((arr_y - fit_func(arr_x, *popt)) / arr_dy)**2).sum()
+
+    ndof = len(arr_y)-len(popt)
+    chisq = chisq/ndof
 
     return popt, pcov, chisq
 
-## Define function to convert data into logarithmic scale
+## Define function to convert list/array of linear data into logarithmic scale as numpy arrays
 
 def Logalize(x_array, y_array, dev_y_array):
     x_log_list = []
@@ -71,54 +77,42 @@ def FindMaxMulti(x_matrix, y_matrix, dev_y_matrix):
 
     return x_max, dev_x_max, obs_max, dev_obs_max
 
-def FindMax(x_array, y_array, dev_y_array):
-    tmp = 0.0
-    dev_tmp = 0.0
-    x_tmp = 0.0
-    dev_x_tmp = x_array[1] - x_array[0]
-    for j in range(len(y_array)):
-        if(y_array[j]>tmp):
-            tmp = y_array[j]
-            dev_tmp = dev_y_array[j]
-            x_tmp = x_array[j]
-    return x_tmp, dev_x_tmp, tmp, dev_tmp
-
-
-
 ## Define function that creates lists of measures after critical point, considering bta_c = 0.44
+## Variable size corresponds to Nlatt by Nlatt = size*10 + 10
 
-def CreateFitArray(x_matrix, y_matrix, dev_y_matrix):
+def CreateFitArrayPower(x_matrix, y_matrix, dev_y_matrix, size, beta_c):
     t_list = []
     y_list = []
     dy_list = []
 
-    x_max, dev_x_max, y_max, dev_y_max = FindMax(x_matrix, y_matrix, dev_y_matrix)
-
     i=0
 
-    while(i<(len(x_matrix))):
-        if(x_matrix[i] > 0.44 + 0.016):
+    while(i<(len(x_matrix[size]))):
+        if(x_matrix[size][i] > beta_c + 0.016): # Distance from beta_c is chosen arbitrarily, knowing that the data can not be too close (finite size effects) nor too far (phase transition effects not visible) from the critical point
 
-            t_list.append(1-0.44/x_matrix[i])
-            y_list.append(y_matrix[i])
-            dy_list.append(dev_y_matrix[i])
+            t_list.append(1-beta_c/x_matrix[size][i]) # Reduced temperature
+            y_list.append(y_matrix[size][i])
+            dy_list.append(dev_y_matrix[size][i])
 
             if(len(t_list)==35):
                 t,y,dy = Logalize(t_list,y_list,dy_list)
                 return t, y, dy
         i = i+1
 
+
+
+
 ## Set input data directory
 
 directory = '/home/exterior/Documents/Physics/MetodiNumerici/Modulo1/_data/'
 
+## Set fit results file
 
-## Load input data for plots and maxima fit
+output_fit = open(directory+'output/fit_results.txt',"w")
+
+## Load input data for plots and fits
 
 Nlatt, bta, ene, dev_ene, mag, dev_mag, sus, dev_sus, heatc, dev_heatc, binder, dev_binder = np.loadtxt(directory+'output/data.txt', unpack=True)
-
-## Load input data for power laws fit
-Nlatt1, bta1, mag1, dev_mag1, sus1, dev_sus1, heatc1, dev_heatc1 = np.loadtxt(directory+'output/data1.txt', unpack=True)
 
 ## Split data arrays into subarrays, one for each value of Nlatt, creating lists of lists, so that the order of the file data.txt is unimportant when plotting, allowing for additional simulations to be run
 
@@ -172,52 +166,84 @@ for i in range(len(Nlatt)):
 for k in range(6):
     Nlatt_split.append(k*10 + 10)
 
+
+
+
 ## Maxima analysis
+
+
+
+## Start fit to find bta_c, maximum of phi_chi (not needed) and nu
 
 bta_max, dev_bta_max, chi_max, dev_chi_max = FindMaxMulti(bta_split, sus_split, dev_sus_split)
 
-
-## Start fit to find bta_c
 initial_values = (0.44, 0.33, 1.0)
 popt_bta, pcov_bta, chisq_bta = Fit(FitBta, Nlatt_split, bta_max, dev_bta_max, initial_values)
 
-## Print fit values for bta_c
+## Write fit values for bta_c, nu onto output file
 
-print('Fit values for beta_c studying maxima points in susceptibility\n')
+output_fit.write('Fit values for beta_c, nu studying maxima points in susceptibility\n')
 
-print(f'bta_c = {popt_bta[0]:.4f} +/- {np.sqrt(pcov_bta[0, 0]):.4f}')
-print(f'max_fss = {popt_bta[1]:.4f} +/- {np.sqrt(pcov_bta[1, 1]):.4f}')
-print(f'nu = {popt_bta[2]:.4f} +/- {np.sqrt(pcov_bta[2, 2]):.4f}')
-print(f'chisq = {chisq_bta:.4f}\n')
+output_fit.write('bta_c\tdev_bta_c\tnu\tdev_nu\txbar\tdev_xbar\tchisq_norm\n')
+
+output_data.write(str(popt_bta[0])+'\t'+str(np.sqrt(pcov_bta[0, 0]))+'\t'+str(popt_bta[2])+'\t'+str(np.sqrt(pcov_bta[2, 2]))+'\t'+str(popt_bta[1])+'\t'+str(np.sqrt(pcov_bta[1, 1]))+'\t'+str(chisq_bta)+'\n')
+
+
 
 ## Start fit to find gamma/nu
 
-initial_values = (-1.75, 0.1, 1.0)
+# Nlatt_log, chi_max_log, dev_chi_max_log = Logalize(Nlatt_split, chi_max, dev_chi_max)
+
+initial_values = (-1.75, 0.1, 0.0)
 popt_gammanu, pcov_gammanu, chisq_gammanu = Fit(FitPower, Nlatt_split, chi_max, dev_chi_max, initial_values)
 
-## Print fit values of gamma/nu
+## Write fit values of gamma/nu onto output file
 
-print('Fit values for gamma/nu studying maxima points in susceptibility\n')
+output_fit.write('Fit values for gamma/nu studying maxima points in susceptibility\n')
 
-print(f'gamma/nu = {-popt_gammanu[0]:.4f} +/- {np.sqrt(pcov_gammanu[0, 0]):.4f}')
-print(f'chisq = {chisq_gammanu:.4f}')
+output_fit.write('gamma/nu\tdev_gamma/nu\tchisq_norm\n')
+
+output_data.write(str(-popt_gammanu[0])+'\t'+str(np.sqrt(pcov_gammanu[0, 0]))+'\t'+str(chisq_gammanu)+'\n')
+
 
 
 ## Using bta_c = 0.44, find gamma and beta exponents using fit in power laws
 
 ## Find gamma from susceptibility
 
-t, chi, dev_chi = CreateFitArray(bta1, sus1, dev_sus1)
+t, chi, dev_chi = CreateFitArrayPower(bta_split, sus_split, dev_sus_split, 5, 0.4406868)
 
 initial_values=(-1.75, 0.003)
 popt_gamma, pcov_gamma, chisq_gamma = Fit(FitLine, t, chi, dev_chi, initial_values)
 
-## Print fit values of gamma
+## Write fit values for gamma onto output file
 
-print('Fit values for gamma/nu studying maxima points in susceptibility\n')
+output_fit.write('Fit values for gamma from power law fit\n')
 
-print(f'gamma = {popt_gamma[0]:.4f} +/- {np.sqrt(pcov_gamma[0, 0]):.4f}')
-print(f'chisq = {chisq_gamma:.4f}')
+output_fit.write('gamma\tdev_gamma\tchisq_norm\n')
+
+output_data.write(str(-popt_gamma[0])+'\t'+str(np.sqrt(pcov_gamma[0, 0]))+'\t'+str(chisq_gamma)+'\n')
+
+
+## Find beta from magnetization
+
+t, m, dev_m = CreateFitArrayPower(bta_split, mag_split, dev_mag_split, 5, 0.4406868)
+
+initial_values=(0.125, 0.003)
+popt_b, pcov_b, chisq_b = Fit(FitLine, t, m, dev_m, initial_values)
+
+## Write fit values for beta onto output file
+
+output_fit.write('Fit values for beta from power law fit\n')
+
+output_fit.write('beta\tdev_beta\tchisq_norm\n')
+
+output_data.write(str(popt_b[0])+'\t'+str(np.sqrt(pcov_b[0, 0]))+'\t'+str(chisq_gamma)+'\n')
+
+
+output_fit.close()
+
+
 
 
 ## Finite Size Scaling
@@ -267,9 +293,12 @@ for i in range(len(mag_split)):
         dev_binder_fss[i].append(dev_binder_split[i][j])
 
 
+
+
+## Plots
+
 ## Plot magnetization for different Nlatt values
 
-'''
 plt.figure(1)
 
 plt.title('Magnetization')
@@ -394,7 +423,7 @@ plt.errorbar(x_fss[3],binder_fss[3], yerr=dev_binder_fss[3], color='cyan',fmt='>
 plt.errorbar(x_fss[4],binder_fss[4], yerr=dev_binder_fss[4], color='green',fmt='v',label="Nlatt=%d"%(Nlatt_split[4]))
 plt.errorbar(x_fss[5],binder_fss[5], yerr=dev_binder_fss[5], color='blue',fmt='^',label="Nlatt=%d"%(Nlatt_split[5]))
 plt.legend(loc="upper left")
-'''
+
 
 plt.figure(9)
 plt.grid(color = 'gray')
