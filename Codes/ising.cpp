@@ -209,14 +209,14 @@ int main() {
         cerr << " Unable to open bta.txt file.\n";
     }
 
-    /* Save lattice for next iteration *//*
+    /* Save lattice for next iteration */
     output_Lattice.open("/home/exterior/Documents/Physics/MetodiNumerici/Modulo1/_data/lattice.txt", ios::trunc);
     if(output_Lattice.is_open()){
         SaveLattice(spin_matrix);
     }
     else{//print error message
         cerr << "Could not save lattice in lattice.txt";
-    }*/
+    }
 
     return 0;
 }

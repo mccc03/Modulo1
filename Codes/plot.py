@@ -80,7 +80,7 @@ def FindMaxMulti(x_matrix, y_matrix, dev_y_matrix):
 ## Define function that creates lists of measures after critical point, considering bta_c = 0.44
 ## Variable size corresponds to Nlatt by Nlatt = size*10 + 10
 
-def CreateFitArrayPower(x_matrix, y_matrix, dev_y_matrix, size, beta_c, l):
+def CreateFitArrayPower(x_matrix, y_matrix, dev_y_matrix, size, beta_c, l, distance):
     t_list = []
     y_list = []
     dy_list = []
@@ -88,7 +88,7 @@ def CreateFitArrayPower(x_matrix, y_matrix, dev_y_matrix, size, beta_c, l):
     i=0
 
     while(i<(len(x_matrix[size]))):
-        if(x_matrix[size][i] > beta_c + 0.016): # Distance from beta_c is chosen arbitrarily, knowing that the data can not be too close (finite size effects) nor too far (phase transition effects not visible) from the critical point
+        if(x_matrix[size][i] > beta_c + distance): # Distance from beta_c is chosen arbitrarily, knowing that the data can not be too close (finite size effects) nor too far (phase transition effects not visible) from the critical point
 
             t_list.append(1-beta_c/x_matrix[size][i]) # Reduced temperature
             y_list.append(y_matrix[size][i])
@@ -205,9 +205,9 @@ popt_gammanu, pcov_gammanu, chisq_gammanu = Fit(FitPower, Nlatt_split, chi_max, 
 
 output_fit.write('Fit values for gamma/nu studying maxima points in susceptibility\n')
 
-output_fit.write('gamma/nu\tdev_gamma/nu\tchisq_norm\n')
+output_fit.write('gamma/nu\tdev_gamma/nu\ta\tdev_a\tb\tdev_b\tchisq_norm\n')
 
-output_fit.write(str(-popt_gammanu[0])+'\t'+str(np.sqrt(pcov_gammanu[0, 0]))+'\t'+str(chisq_gammanu)+'\n')
+output_fit.write(str(-popt_gammanu[0])+'\t'+str(np.sqrt(pcov_gammanu[0, 0]))+'\t'+str(popt_gammanu[1])+'\t'+str(np.sqrt(pcov_gammanu[1, 1]))+'\t'+str(popt_gammanu[2])+'\t'+str(np.sqrt(pcov_gammanu[2, 2]))+'\t'+str(chisq_gammanu)+'\n')
 
 
 
@@ -215,7 +215,7 @@ output_fit.write(str(-popt_gammanu[0])+'\t'+str(np.sqrt(pcov_gammanu[0, 0]))+'\t
 
 ## Find gamma from susceptibility
 
-t, chi, dev_chi = CreateFitArrayPower(bta_split, sus_split, dev_sus_split, 5, 0.4406868, 35)
+t, chi, dev_chi = CreateFitArrayPower(bta_split, sus_split, dev_sus_split, 3, 0.4406868, 35, 0.016)
 
 initial_values=(-1.75, 0.003)
 popt_gamma, pcov_gamma, chisq_gamma = Fit(FitLinear, t, chi, dev_chi, initial_values)
@@ -224,14 +224,14 @@ popt_gamma, pcov_gamma, chisq_gamma = Fit(FitLinear, t, chi, dev_chi, initial_va
 
 output_fit.write('Fit values for gamma from power law fit\n')
 
-output_fit.write('gamma\tdev_gamma\tchisq_norm\n')
+output_fit.write('gamma\tdev_gamma\ta\tdev_a\tchisq_norm\n')
 
-output_fit.write(str(-popt_gamma[0])+'\t'+str(np.sqrt(pcov_gamma[0, 0]))+'\t'+str(chisq_gamma)+'\n')
+output_fit.write(str(-popt_gamma[0])+'\t'+str(np.sqrt(pcov_gamma[0, 0]))+'\t'+str(popt_gamma[1])+'\t'+str(np.sqrt(pcov_gamma[1, 1]))+'\t'+str(chisq_gamma)+'\n')
 
 
 ## Find beta from magnetization
 
-tb, m, dev_m = CreateFitArrayPower(bta_split, mag_split, dev_mag_split, 5, 0.4406868, 15)
+tb, m, dev_m = CreateFitArrayPower(bta_split, mag_split, dev_mag_split, 3, 0.4406868, 15, 0.013)
 
 initial_values=(0.125, 0.003)
 popt_b, pcov_b, chisq_b = Fit(FitLinear, tb, m, dev_m, initial_values)
@@ -240,9 +240,9 @@ popt_b, pcov_b, chisq_b = Fit(FitLinear, tb, m, dev_m, initial_values)
 
 output_fit.write('Fit values for beta from power law fit\n')
 
-output_fit.write('beta\tdev_beta\tchisq_norm\n')
+output_fit.write('beta\tdev_beta\ta\tdev_a\tchisq_norm\n')
 
-output_fit.write(str(popt_b[0])+'\t'+str(np.sqrt(pcov_b[0, 0]))+'\t'+str(chisq_gamma)+'\n')
+output_fit.write(str(popt_b[0])+'\t'+str(np.sqrt(pcov_b[0, 0]))+'\t'+str(popt_b[1])+'\t'+str(np.sqrt(pcov_b[1, 1]))+'\t'+str(chisq_b)+'\n')
 
 
 output_fit.close()
@@ -389,7 +389,7 @@ plt.legend(loc="upper left")
 plt.figure(6)
 
 plt.title('Susceptibility - FSS')
-plt.ylabel(r'$\chi N_{latt} ^{-\gamma / \nu}$')
+plt.ylabel(r'$\chi N_{latt} ^{-7/4}$')
 plt.xlabel(r'$N_{latt} (\beta -\beta _c)$')
 plt.grid(color = 'gray')
 plt.errorbar(x_fss[0],sus_fss[0], yerr=dev_sus_fss[0], color='gray',fmt=',',label="Nlatt=%d"%(Nlatt_split[0]))
@@ -403,7 +403,7 @@ plt.legend(loc="upper left")
 plt.figure(7)
 
 plt.title('Magnetization - FSS')
-plt.ylabel(r'$M N_{latt} ^{\beta / \nu}$')
+plt.ylabel(r'$M N_{latt} ^{1/8}$')
 plt.xlabel(r'$N_{latt} (\beta -\beta _c)$')
 plt.grid(color = 'gray')
 plt.errorbar(x_fss[0],mag_fss[0], yerr=dev_mag_fss[0], color='gray',fmt=',',label="Nlatt=%d"%(Nlatt_split[0]))
@@ -430,13 +430,21 @@ plt.legend(loc="upper left")
 
 
 plt.figure(9)
+
+plt.title(r'Fit for $\gamma$')
+plt.xlabel(r'$\mathrm{log} |t|$')
+plt.ylabel(r'$\mathrm{log} a + \gamma \mathrm{log} |t|$')
 plt.grid(color = 'gray')
-plt.errorbar(t,chi,yerr=dev_chi)
-plt.plot(t,FitLinear(t,*popt_gamma))
+plt.errorbar(t,chi,yerr=dev_chi, fmt='.', color='royalblue')
+plt.plot(t,FitLinear(t,*popt_gamma), color='plum')
 
 plt.figure(10)
+
+plt.title(r'Fit for $\beta$')
+plt.xlabel(r'$\mathrm{log} |t|$')
+plt.ylabel(r'$\mathrm{log} a + \beta \mathrm{log} |t|$')
 plt.grid(color = 'gray')
-plt.errorbar(tb,m,yerr=dev_m)
-plt.plot(tb,FitLinear(tb,*popt_b))
+plt.errorbar(tb,m,yerr=dev_m, fmt='.', color='royalblue')
+plt.plot(tb,FitLinear(tb,*popt_b), color='plum')
 
 plt.show()
