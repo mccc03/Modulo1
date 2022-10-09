@@ -80,7 +80,7 @@ def FindMaxMulti(x_matrix, y_matrix, dev_y_matrix):
 ## Define function that creates lists of measures after critical point, considering bta_c = 0.44
 ## Variable size corresponds to Nlatt by Nlatt = size*10 + 10
 
-def CreateFitArrayPower(x_matrix, y_matrix, dev_y_matrix, size, beta_c):
+def CreateFitArrayPower(x_matrix, y_matrix, dev_y_matrix, size, beta_c, l):
     t_list = []
     y_list = []
     dy_list = []
@@ -94,7 +94,7 @@ def CreateFitArrayPower(x_matrix, y_matrix, dev_y_matrix, size, beta_c):
             y_list.append(y_matrix[size][i])
             dy_list.append(dev_y_matrix[size][i])
 
-            if(len(t_list)==35):
+            if(len(t_list)==l):
                 t,y,dy = Logalize(t_list,y_list,dy_list)
                 return t, y, dy
         i = i+1
@@ -131,9 +131,18 @@ dev_heatc_split=[]
 binder_split=[]
 dev_binder_split=[]
 
+dist = 0 # Array length for each lattice size
+for i in range(len(Nlatt)-1):
+    if(Nlatt[i]<Nlatt[i+1]):
+        Nlatt_split.append(Nlatt[i])
+        if(dist==0):
+            dist = i+1
+Nlatt_split.append(Nlatt[len(Nlatt)-1])
+
+
 ## Create lists of lists, second index
 
-for _ in range(6):
+for _ in range(len(Nlatt_split)):
     bta_split.append([])
     ene_split.append([])
     dev_ene_split.append([])
@@ -149,22 +158,17 @@ for _ in range(6):
 ## Fill arrays from data
 
 for i in range(len(Nlatt)):
-    for j in range(6):
-        if(Nlatt[i]==(10*j+10)):
-            bta_split[j].append(bta[i])
-            ene_split[j].append(ene[i])
-            dev_ene_split[j].append(dev_ene[i])
-            mag_split[j].append(mag[i])
-            dev_mag_split[j].append(dev_mag[i])
-            sus_split[j].append(sus[i])
-            dev_sus_split[j].append(dev_sus[i])
-            heatc_split[j].append(heatc[i])
-            dev_heatc_split[j].append(dev_heatc[i])
-            binder_split[j].append(binder[i])
-            dev_binder_split[j].append(dev_binder[i])
-
-for k in range(6):
-    Nlatt_split.append(k*10 + 10)
+    bta_split[i//dist].append(bta[i])
+    ene_split[i//dist].append(ene[i])
+    dev_ene_split[i//dist].append(dev_ene[i])
+    mag_split[i//dist].append(mag[i])
+    dev_mag_split[i//dist].append(dev_mag[i])
+    sus_split[i//dist].append(sus[i])
+    dev_sus_split[i//dist].append(dev_sus[i])
+    heatc_split[i//dist].append(heatc[i])
+    dev_heatc_split[i//dist].append(dev_heatc[i])
+    binder_split[i//dist].append(binder[i])
+    dev_binder_split[i//dist].append(dev_binder[i])
 
 
 
@@ -186,7 +190,7 @@ output_fit.write('Fit values for beta_c, nu studying maxima points in susceptibi
 
 output_fit.write('bta_c\tdev_bta_c\tnu\tdev_nu\txbar\tdev_xbar\tchisq_norm\n')
 
-output_data.write(str(popt_bta[0])+'\t'+str(np.sqrt(pcov_bta[0, 0]))+'\t'+str(popt_bta[2])+'\t'+str(np.sqrt(pcov_bta[2, 2]))+'\t'+str(popt_bta[1])+'\t'+str(np.sqrt(pcov_bta[1, 1]))+'\t'+str(chisq_bta)+'\n')
+output_fit.write(str(popt_bta[0])+'\t'+str(np.sqrt(pcov_bta[0, 0]))+'\t'+str(popt_bta[2])+'\t'+str(np.sqrt(pcov_bta[2, 2]))+'\t'+str(popt_bta[1])+'\t'+str(np.sqrt(pcov_bta[1, 1]))+'\t'+str(chisq_bta)+'\n')
 
 
 
@@ -203,7 +207,7 @@ output_fit.write('Fit values for gamma/nu studying maxima points in susceptibili
 
 output_fit.write('gamma/nu\tdev_gamma/nu\tchisq_norm\n')
 
-output_data.write(str(-popt_gammanu[0])+'\t'+str(np.sqrt(pcov_gammanu[0, 0]))+'\t'+str(chisq_gammanu)+'\n')
+output_fit.write(str(-popt_gammanu[0])+'\t'+str(np.sqrt(pcov_gammanu[0, 0]))+'\t'+str(chisq_gammanu)+'\n')
 
 
 
@@ -211,10 +215,10 @@ output_data.write(str(-popt_gammanu[0])+'\t'+str(np.sqrt(pcov_gammanu[0, 0]))+'\
 
 ## Find gamma from susceptibility
 
-t, chi, dev_chi = CreateFitArrayPower(bta_split, sus_split, dev_sus_split, 5, 0.4406868)
+t, chi, dev_chi = CreateFitArrayPower(bta_split, sus_split, dev_sus_split, 5, 0.4406868, 35)
 
 initial_values=(-1.75, 0.003)
-popt_gamma, pcov_gamma, chisq_gamma = Fit(FitLine, t, chi, dev_chi, initial_values)
+popt_gamma, pcov_gamma, chisq_gamma = Fit(FitLinear, t, chi, dev_chi, initial_values)
 
 ## Write fit values for gamma onto output file
 
@@ -222,15 +226,15 @@ output_fit.write('Fit values for gamma from power law fit\n')
 
 output_fit.write('gamma\tdev_gamma\tchisq_norm\n')
 
-output_data.write(str(-popt_gamma[0])+'\t'+str(np.sqrt(pcov_gamma[0, 0]))+'\t'+str(chisq_gamma)+'\n')
+output_fit.write(str(-popt_gamma[0])+'\t'+str(np.sqrt(pcov_gamma[0, 0]))+'\t'+str(chisq_gamma)+'\n')
 
 
 ## Find beta from magnetization
 
-t, m, dev_m = CreateFitArrayPower(bta_split, mag_split, dev_mag_split, 5, 0.4406868)
+tb, m, dev_m = CreateFitArrayPower(bta_split, mag_split, dev_mag_split, 5, 0.4406868, 15)
 
 initial_values=(0.125, 0.003)
-popt_b, pcov_b, chisq_b = Fit(FitLine, t, m, dev_m, initial_values)
+popt_b, pcov_b, chisq_b = Fit(FitLinear, tb, m, dev_m, initial_values)
 
 ## Write fit values for beta onto output file
 
@@ -238,7 +242,7 @@ output_fit.write('Fit values for beta from power law fit\n')
 
 output_fit.write('beta\tdev_beta\tchisq_norm\n')
 
-output_data.write(str(popt_b[0])+'\t'+str(np.sqrt(pcov_b[0, 0]))+'\t'+str(chisq_gamma)+'\n')
+output_fit.write(str(popt_b[0])+'\t'+str(np.sqrt(pcov_b[0, 0]))+'\t'+str(chisq_gamma)+'\n')
 
 
 output_fit.close()
@@ -428,6 +432,11 @@ plt.legend(loc="upper left")
 plt.figure(9)
 plt.grid(color = 'gray')
 plt.errorbar(t,chi,yerr=dev_chi)
-plt.plot(t,FitLine(t,*popt_gamma))
+plt.plot(t,FitLinear(t,*popt_gamma))
+
+plt.figure(10)
+plt.grid(color = 'gray')
+plt.errorbar(tb,m,yerr=dev_m)
+plt.plot(tb,FitLinear(tb,*popt_b))
 
 plt.show()
