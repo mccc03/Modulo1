@@ -8,5 +8,6 @@ init_flag --> (int) that initializes the matrix: if its value is (0) then all th
 ext_field --> (double) value of the external magnetic field
 thermal_len --> (int) measures to be discarded
 
+At the end of ising.cpp, bta is increased by 0.005
 
-The file ising_data_analysis.py stores the value of bta and Nlatt onto its output file, so keep this in mind when changing it during the simulations
+The Shell file start_simulation.sh is used to iterate the simulation for different bta's
