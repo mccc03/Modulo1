@@ -4,7 +4,7 @@ measures --> (int) number of measurements taken
 resamplings --> (int) number of times the measurements are resampled
 decorrel_len --> (int) number of times the matrix is updated before taking a measurement
 Nlatt --> (int) length of the side of the matrix
-init_flag --> (int) that initializes the matrix: if its value is (0) then all the spins are aligned (cold state), otherwise all the spins are random (hot state)
+init_flag --> (int) that initializes the matrix: if its value is (0) then all the spins are aligned (cold state), if its value is (1) all the spins are random (hot state), otherwise the code loads the last lattice configuration of the preious simulation
 ext_field --> (double) value of the external magnetic field
 thermal_len --> (int) measures to be discarded
 
