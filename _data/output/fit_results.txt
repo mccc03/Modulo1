@@ -1,0 +1,12 @@
+Fit values for beta_c, nu studying maxima points in susceptibility
+bta_c	dev_bta_c	nu	dev_nu	xbar	dev_xbar	chisq_norm
+0.4367427801517355	0.0031756331319345286	1.213352510751224	0.33400475674676294	0.4854233980924089	0.3327189435952392	2.2464076262168966
+Fit values for gamma/nu studying maxima points in susceptibility
+gamma/nu	dev_gamma/nu	chisq_norm
+1.7668586466453369	0.014723389794850618	0.20811348034384994
+Fit values for gamma from power law fit
+gamma	dev_gamma	chisq_norm
+1.7254440251502092	0.026452974612899447	0.5159977387721172
+Fit values for beta from power law fit
+beta	dev_beta	chisq_norm
+0.11491666785853001	0.0009827223493139735	0.5159977387721172
